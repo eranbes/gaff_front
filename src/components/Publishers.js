@@ -13,19 +13,17 @@ import IconButton from "@material-ui/core/IconButton";
 
 import rest from './Rest'
 
-export const Publishers = () => {
+export const Publishers = ({setRoute, setPublisherId}) => {
 
     const [publishers, setPublishers] = useState([])
-    const [newPublisher, setNewPublisher] = useState([])
+    const [newPublisher, setNewPublisher] = useState('')
 
     useEffect(() => {
 
         rest('publishers')
             .then(res => {
 
-                console.log(res)
-
-                setPublishers(res.body)
+                if (res.status === 200) setPublishers(res.body)
 
             })
 
@@ -37,6 +35,8 @@ export const Publishers = () => {
 
     const addPublisher = () => {
 
+        if (!newPublisher) return;
+
         rest('publishers', "POST", {newPublisher})
             .then(res => {
 
@@ -44,11 +44,18 @@ export const Publishers = () => {
                     setPublishers(res.body)
                     setNewPublisher('')
                 }
+
             })
 
     }
 
-    console.log('publishers', publishers)
+    const editPublisher = id => {
+
+        setPublisherId(id);
+        setRoute('publisher')
+
+    }
+    // console.log('publishers', publishers)
 
     return <Grid container
                  style={{marginBottom: '1rem'}}
@@ -65,6 +72,7 @@ export const Publishers = () => {
 
             <Button variant="contained" color="primary"
                     style={{margin: '1rem'}}
+                    disabled={newPublisher === ''}
                     onClick={() => addPublisher()}
             >
                 add publisher
@@ -76,8 +84,8 @@ export const Publishers = () => {
                             primary={d.name}
                         />
                         <ListItemSecondaryAction>
-                            <IconButton edge="end" aria-label="delete"
-                                // onClick={() => deletePublisher(d.id)}
+                            <IconButton edge="end" aria-label="edit"
+                                onClick={() => editPublisher(d.id)}
                             >
                                 <EditIcon />
                             </IconButton>

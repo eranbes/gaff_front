@@ -2,7 +2,12 @@ import {SERVER} from './Constants';
 
 let response = {};
 
-export default function fetchPost(url, method = 'GET', data = null) {
+/**
+ * @param {string} url
+ * @param {string} method
+ * @param {any} data
+ */
+const fetchPost = (url, method = 'GET', data = null) => {
 
     let init = {
         method,
@@ -32,4 +37,6 @@ export default function fetchPost(url, method = 'GET', data = null) {
             return response;
         })
 
-}
+};
+
+export default fetchPost

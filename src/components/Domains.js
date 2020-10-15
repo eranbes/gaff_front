@@ -23,9 +23,7 @@ export const Domains = () => {
         rest('domains')
             .then(res => {
 
-                console.log(res)
-
-                setDomains(res.body)
+                if (res.status === 200) setDomains(res.body)
 
             })
 
@@ -40,17 +38,14 @@ export const Domains = () => {
         rest('domains', "POST", {newDomain})
             .then(res => {
 
-                console.log(res)
-
                 if (res.status === 201) {
                     setDomains(res.body)
                     setNewDomain('')
                 }
+
             })
 
     }
-
-    console.log('domains', domains)
 
     return <Grid container
                  style={{marginBottom: '1rem'}}

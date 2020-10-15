@@ -5,8 +5,8 @@ import {Publisher} from "./components/Publisher";
 
 function App() {
 
-    const [route, setRoute] = useState('publisher');
-    const [publisherId, setPublisherId] = useState(1);
+    const [route, setRoute] = useState('publishers');
+    const [publisherId, setPublisherId] = useState(0);
 
     return route === 'publishers'
         ? <Publishers setRoute={setRoute} setPublisherId={setPublisherId}/>

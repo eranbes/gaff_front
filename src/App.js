@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {Domains} from "./components/Domains";
 import {Publishers} from "./components/Publishers";
 import {Publisher} from "./components/Publisher";
 
@@ -12,9 +11,7 @@ function App() {
         ? <Publishers setRoute={setRoute} setPublisherId={setPublisherId}/>
         : route === 'publisher'
             ? <Publisher setRoute={setRoute} id={publisherId}/>
-            : route === 'domains'
-                ? <Domains setRoute={setRoute}/>
-                : null
+            : null
 
 }
 

@@ -50,7 +50,6 @@ export const Domains = () => {
     return <Grid container
                  style={{marginBottom: '1rem'}}
                  direction={"column"} alignItems={"center"} component={Paper}>
-
         <Grid item>
             <Typography variant={"h5"}>Domains</Typography>
         </Grid>
@@ -72,15 +71,14 @@ export const Domains = () => {
                         <ListItemText
                             primary={d.name}
                         />
-                    <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete"
-                                    // onClick={() => deleteDomain(d.id)}
-                        >
-                            <EditIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
-
+                        <ListItemSecondaryAction>
+                            <IconButton edge="end" aria-label="delete"
+                                // onClick={() => deleteDomain(d.id)}
+                            >
+                                <EditIcon/>
+                            </IconButton>
+                        </ListItemSecondaryAction>
+                    </ListItem>
                 )}
             </List>
         </Grid>

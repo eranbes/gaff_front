@@ -12,18 +12,24 @@ import EditIcon from '@material-ui/icons/Edit';
 import IconButton from "@material-ui/core/IconButton";
 
 import rest from './Rest'
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 export const Publishers = ({setRoute, setPublisherId}) => {
 
     const [publishers, setPublishers] = useState([])
     const [newPublisher, setNewPublisher] = useState('')
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
+
+        setLoading(true)
 
         rest('publishers')
             .then(res => {
 
+
                 if (res.status === 200) setPublishers(res.body)
+                setLoading(false)
 
             })
 
@@ -35,10 +41,14 @@ export const Publishers = ({setRoute, setPublisherId}) => {
 
     const addPublisher = () => {
 
-        if (!newPublisher) return;
+        if (!newPublisher || loading) return;
+
+        setLoading(true)
 
         rest('publishers', "POST", {newPublisher})
             .then(res => {
+
+                setLoading(false)
 
                 if (res.status === 201) {
                     setPublishers(res.body)
@@ -55,7 +65,6 @@ export const Publishers = ({setRoute, setPublisherId}) => {
         setRoute('publisher')
 
     }
-    // console.log('publishers', publishers)
 
     return <Grid container
                  style={{marginBottom: '1rem'}}
@@ -72,28 +81,31 @@ export const Publishers = ({setRoute, setPublisherId}) => {
 
             <Button variant="contained" color="primary"
                     style={{margin: '1rem'}}
-                    disabled={newPublisher === ''}
+                    disabled={newPublisher === '' || loading}
                     onClick={() => addPublisher()}
             >
                 add publisher
             </Button>
 
             <List>
+                {loading
+                    ? <LinearProgress/>
+                    : null}
                 {publishers.map(d => <ListItem key={'listpublisherskey' + d.name}>
                         <ListItemText
                             primary={d.name}
                         />
                         <ListItemSecondaryAction>
                             <IconButton edge="end" aria-label="edit"
-                                onClick={() => editPublisher(d.id)}
+                                        onClick={() => editPublisher(d.id)}
                             >
-                                <EditIcon />
+                                <EditIcon/>
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
-
                 )}
             </List>
+
         </Grid>
     </Grid>
 

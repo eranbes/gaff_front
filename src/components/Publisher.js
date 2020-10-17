@@ -4,7 +4,6 @@ import {Paper} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 
 import rest from './Rest'
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from "@material-ui/core/IconButton";
@@ -14,36 +13,45 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from "@material-ui/core/Typography";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 export const Publisher = ({setRoute, id}) => {
 
-    const [publisher, setPublisher] = useState('')
+    const [publisher, setPublisher] = useState(null)
     const [entries, setEntries] = useState([])
     const [newEntry, setNewEntry] = useState('')
+    const [domains, setDomains] = useState([])
+    const [newDomain, setNewDomain] = useState('')
+    const [loading, setLoading] = useState(false)
+
 
     useEffect(() => {
+
+        setLoading(true)
 
         rest('publishers/' + id)
             .then(res => {
 
+                setLoading(false)
+
                 if (res.status === 200) {
                     setPublisher(res.body.name)
                     setEntries(res.body.entries)
+                    setDomains(res.body.domains)
                 }
 
             })
 
 
-    }, [])
+    }, [id])
 
-    const newId = () => {
+    const newId = arr => {
 
-        let i = 1;
+        for (let i = 1; i < 100000; i++) {
 
-        while (true) {
-
-            if (entries.find(e => e.id === i)) i++
-            else return i
+            if (!arr.find(e => e.id === i)) return i
 
         }
 
@@ -57,12 +65,16 @@ export const Publisher = ({setRoute, id}) => {
         setNewEntry(value)
     }
 
+    const handleNewDomain = value => {
+        setNewDomain(value)
+    }
+
     const addEntry = (is_app = false) => {
 
         setEntries(prev => {
 
             let name = newEntry
-            let id = newId()
+            let id = newId(entries)
 
             prev.push({
                 id,
@@ -83,22 +95,72 @@ export const Publisher = ({setRoute, id}) => {
 
     }
 
+    const addDomain = () => {
+
+        setDomains(prev => {
+
+            let name = newDomain
+            let id = newId(domains)
+
+            prev.push({
+                id,
+                name,
+                ns_ads: false,
+                ns_app_ads: true
+            })
+
+            return prev
+
+        })
+
+        setNewDomain('')
+
+    }
+
+    const handleDomain = (id, value) => {
+
+        console.log(value)
+
+        setDomains(prev => prev.map(d => {
+                if (d.id === id) {
+                    d.name = value
+                }
+                return d
+            })
+        )
+
+    }
+
+    const handleAds = (id, field, checked) => {
+
+        setDomains(prev => prev.map(d => {
+            if (d.id === id) {
+                d[field] = checked;
+            }
+            return d
+        }))
+
+    }
+
     const savePublisher = () => {
+
+        setLoading(true)
 
         rest('publishers/' + id, 'PUT', {
             name: publisher,
-            entries
+            entries,
+            domains
         })
             .then(res => {
 
-                console.log(res)
+                setLoading(false)
 
             })
 
     }
 
-    return publisher === ''
-        ? <CircularProgress/>
+    return publisher === null
+        ? <LinearProgress/>
         : <>
             <Grid container
                   style={{marginBottom: '1rem'}}
@@ -107,7 +169,6 @@ export const Publisher = ({setRoute, id}) => {
                 <Grid container
                       direction="row"
                       justify="space-around"
-                    // alignItems="center"
                 >
                     <Grid item>
                         <IconButton onClick={() => setRoute('publishers')}>
@@ -117,10 +178,15 @@ export const Publisher = ({setRoute, id}) => {
                     <Grid item>
                         <TextField label="Publisher"
                                    onChange={e => handlePublisherName(e.target.value)}
-                                   value={publisher}/>
+                                   value={publisher}
+                        />
                     </Grid>
                     <Grid item>
                     </Grid>
+                </Grid>
+
+                <Grid item>
+                    <Typography variant={"h5"}>Entries</Typography>
                 </Grid>
 
                 <Grid item
@@ -149,59 +215,108 @@ export const Publisher = ({setRoute, id}) => {
 
 
                 </Grid>
-                <Grid item
-                      style={{margin: '1rem'}}
-                >
 
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        style={{margin: '1rem'}}
-                        onClick={() => setRoute('publishers')}
+                {
+                    [
+                        {text: 'ads.txt', is_app: false},
+                        {text: 'app-ads.txt', is_app: true},
+                    ].map(g => <Grid container
+                                     key={'gridadsqwexunrfe' + g.text}
+                                     style={{marginBottom: '1rem'}}
+                                     direction={"column"} alignItems={"center"} component={Paper}
                     >
-                        cancel
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        style={{margin: '1rem'}}
-                        onClick={() => savePublisher()}
-                    >
-                        save
-                    </Button>
+                        <Typography variant={"h6"}>{g.text}</Typography>
+                        <List>
+                            {entries.filter(e => e.is_app === g.is_app)
+                                .map(e => <ListItem key={'listentrfewfcsdkey' + e.name}>
+                                        <ListItemText
+                                            primary={e.name}
+                                        />
+                                        <ListItemSecondaryAction>
+                                            <IconButton edge="end" aria-label="delete"
+                                                        onClick={() => deleteEntry(e.id)}
+                                            >
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                )}
+                        </List>
 
+                    </Grid>)
+                }
+                <Grid item>
+                    <Typography variant={"h5"}>Domains</Typography>
                 </Grid>
-            </Grid>
+                <Grid item>
 
-            {
-                [
-                    {text: 'ads.txt', is_app: false},
-                    {text: 'app-ads.txt', is_app: true},
-                ].map(g => <Grid container
-                                 key={'gridadsqwexunrfe' + g.text}
-                                 style={{marginBottom: '1rem'}}
-                                 direction={"column"} alignItems={"center"} component={Paper}
-                >
-                    <Typography variant={"h6"}>{g.text}</Typography>
+                    <TextField label="New domain"
+                               onChange={e=> handleNewDomain(e.target.value)}
+                               value={newDomain}/>
+
+                    <Button variant="contained" color="primary"
+                            style={{margin: '1rem'}}
+                            onClick={() => addDomain()}
+                            disabled={newDomain === ''}
+                    >
+                        add domain
+                    </Button>
+
                     <List>
-                        {entries.filter(e => e.is_app === g.is_app)
-                            .map(e => <ListItem key={'listentrfewfcsdkey' + e.name}>
-                                    <ListItemText
-                                        primary={e.name}
-                                    />
-                                    <ListItemSecondaryAction>
-                                        <IconButton edge="end" aria-label="delete"
-                                                    onClick={() => deleteEntry(e.id)}
-                                        >
-                                            <DeleteIcon/>
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                            )}
+                        {domains.map(d => <div key={'listdomainskey' + d.name}>
+                                <TextField
+                                    onChange={e => handleDomain(d.id, e.target.value)}
+                                    value={d.name}
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        checked={!!d.ns_ads}
+                                        onChange={e => handleAds(d.id, 'ns_ads', e.target.checked)}
+                                    />}
+                                    label="ads.txt"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        checked={!!d.ns_app_ads}
+                                        onChange={e => handleAds(d.id, 'ns_app_ads', e.target.checked)}
+                                    />}
+                                    label="app-ads.txt"
+                                />
+                            </div>
+                        )}
                     </List>
 
-                </Grid>)
-            }
+                </Grid>
+
+            </Grid>
+
+            {loading
+            ? <LinearProgress/>
+            : <Grid container
+                  justify="space-around"
+                  style={{margin: '1rem'}}
+            >
+
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{margin: '1rem'}}
+                    onClick={() => setRoute('publishers')}
+                >
+                    cancel
+                </Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    style={{margin: '1rem'}}
+                    onClick={() => savePublisher()}
+                    disabled={publisher === ''}
+                >
+                    save
+                </Button>
+
+            </Grid>}
+
         </>
 
 }

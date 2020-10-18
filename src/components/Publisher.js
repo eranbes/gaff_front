@@ -17,6 +17,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
+
 export const Publisher = ({setRoute, id}) => {
 
     const [publisher, setPublisher] = useState(null)
@@ -26,24 +27,25 @@ export const Publisher = ({setRoute, id}) => {
     const [newDomain, setNewDomain] = useState('')
     const [loading, setLoading] = useState(false)
 
-
     useEffect(() => {
 
-        setLoading(true)
+        if (+id > 0) {
 
-        rest('publishers/' + id)
-            .then(res => {
+            setLoading(true)
 
-                setLoading(false)
+            rest('publishers/' + id)
+                .then(res => {
 
-                if (res.status === 200) {
-                    setPublisher(res.body.name)
-                    setEntries(res.body.entries)
-                    setDomains(res.body.domains)
-                }
+                    setLoading(false)
 
-            })
+                    if (res.status === 200) {
+                        setPublisher(res.body.name)
+                        setEntries(res.body.entries)
+                        setDomains(res.body.domains)
+                    }
 
+                })
+        }
 
     }, [id])
 
@@ -55,18 +57,6 @@ export const Publisher = ({setRoute, id}) => {
 
         }
 
-    }
-
-    const handlePublisherName = value => {
-        setPublisher(value)
-    }
-
-    const handleNewEntry = value => {
-        setNewEntry(value)
-    }
-
-    const handleNewDomain = value => {
-        setNewDomain(value)
     }
 
     const addEntry = (is_app = false) => {
@@ -117,27 +107,16 @@ export const Publisher = ({setRoute, id}) => {
 
     }
 
-    const handleDomain = (id, value) => {
+    const handleDomain = (id, field, value) => {
 
-        console.log(value)
+        setDomains(domains.map(d => {
 
-        setDomains(prev => prev.map(d => {
-                if (d.id === id) {
-                    d.name = value
-                }
-                return d
-            })
-        )
-
-    }
-
-    const handleAds = (id, field, checked) => {
-
-        setDomains(prev => prev.map(d => {
             if (d.id === id) {
-                d[field] = checked;
+                d[field] = value;
             }
+
             return d
+
         }))
 
     }
@@ -177,7 +156,7 @@ export const Publisher = ({setRoute, id}) => {
                     </Grid>
                     <Grid item>
                         <TextField label="Publisher"
-                                   onChange={e => handlePublisherName(e.target.value)}
+                                   onChange={e => setPublisher(e.target.value)}
                                    value={publisher}
                         />
                     </Grid>
@@ -194,7 +173,7 @@ export const Publisher = ({setRoute, id}) => {
                 >
 
                     <TextField label="New entry"
-                               onChange={e => handleNewEntry(e.target.value)}
+                               onChange={e => setNewEntry(e.target.value)}
                                value={newEntry}/>
 
                     <Button variant="contained" color="primary"
@@ -251,7 +230,7 @@ export const Publisher = ({setRoute, id}) => {
                 <Grid item>
 
                     <TextField label="New domain"
-                               onChange={e=> handleNewDomain(e.target.value)}
+                               onChange={e => setNewDomain(e.target.value)}
                                value={newDomain}/>
 
                     <Button variant="contained" color="primary"
@@ -263,26 +242,30 @@ export const Publisher = ({setRoute, id}) => {
                     </Button>
 
                     <List>
-                        {domains.map(d => <div key={'listdomainskey' + d.name}>
-                                <TextField
-                                    onChange={e => handleDomain(d.id, e.target.value)}
-                                    value={d.name}
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={!!d.ns_ads}
-                                        onChange={e => handleAds(d.id, 'ns_ads', e.target.checked)}
-                                    />}
-                                    label="ads.txt"
-                                />
-                                <FormControlLabel
-                                    control={<Checkbox
-                                        checked={!!d.ns_app_ads}
-                                        onChange={e => handleAds(d.id, 'ns_app_ads', e.target.checked)}
-                                    />}
-                                    label="app-ads.txt"
-                                />
-                            </div>
+                        {domains.map(d => {
+
+                            return <div key={'listdomainskey' + d.id}>
+                                    <TextField
+                                        onChange={e => handleDomain(d.id, 'name', e.target.value)}
+                                        value={d.name}
+                                        style={{marginRight: '1rem'}}
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={!!d.ns_ads}
+                                            onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
+                                        />}
+                                        label="ads.txt"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={!!d.ns_app_ads}
+                                            onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
+                                        />}
+                                        label="app-ads.txt"
+                                    />
+                                </div>
+                            }
                         )}
                     </List>
 
@@ -291,31 +274,31 @@ export const Publisher = ({setRoute, id}) => {
             </Grid>
 
             {loading
-            ? <LinearProgress/>
-            : <Grid container
-                  justify="space-around"
-                  style={{margin: '1rem'}}
-            >
-
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    style={{margin: '1rem'}}
-                    onClick={() => setRoute('publishers')}
+                ? <LinearProgress/>
+                : <Grid container
+                        justify="space-around"
+                        style={{margin: '1rem'}}
                 >
-                    cancel
-                </Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    style={{margin: '1rem'}}
-                    onClick={() => savePublisher()}
-                    disabled={publisher === ''}
-                >
-                    save
-                </Button>
 
-            </Grid>}
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        style={{margin: '1rem'}}
+                        onClick={() => setRoute('publishers')}
+                    >
+                        cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        style={{margin: '1rem'}}
+                        onClick={() => savePublisher()}
+                        disabled={publisher === ''}
+                    >
+                        save
+                    </Button>
+
+                </Grid>}
 
         </>
 

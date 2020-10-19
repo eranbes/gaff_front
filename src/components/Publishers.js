@@ -10,11 +10,12 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import EditIcon from '@material-ui/icons/Edit';
 import IconButton from "@material-ui/core/IconButton";
+import FindInPageIcon from '@material-ui/icons/FindInPage';
 
 import rest from './Rest'
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-export const Publishers = ({setRoute, setPublisherId}) => {
+export const Publishers = ({setRoute, setPublisherId, setPublisher}) => {
 
     const [publishers, setPublishers] = useState([])
     const [newPublisher, setNewPublisher] = useState('')
@@ -26,7 +27,6 @@ export const Publishers = ({setRoute, setPublisherId}) => {
 
         rest('publishers')
             .then(res => {
-
 
                 if (res.status === 200) setPublishers(res.body)
                 setLoading(false)
@@ -66,6 +66,13 @@ export const Publishers = ({setRoute, setPublisherId}) => {
 
     }
 
+    const crawl = p => {
+
+        setPublisher(p);
+        setRoute('crawl')
+
+    }
+
     return <Grid container
                  style={{marginBottom: '1rem'}}
                  direction={"column"} alignItems={"center"} component={Paper}>
@@ -91,15 +98,20 @@ export const Publishers = ({setRoute, setPublisherId}) => {
                 {loading
                     ? <LinearProgress/>
                     : null}
-                {publishers.map(d => <ListItem key={'listpublisherskey' + d.name}>
+                {publishers.map(p => <ListItem key={'listpublisherskey' + p.name}>
                         <ListItemText
-                            primary={d.name}
+                            primary={p.name}
                         />
                         <ListItemSecondaryAction>
                             <IconButton edge="end" aria-label="edit"
-                                        onClick={() => editPublisher(d.id)}
+                                        onClick={() => editPublisher(p.id)}
                             >
                                 <EditIcon/>
+                            </IconButton>
+                            <IconButton edge="end" aria-label="edit"
+                                        onClick={() => crawl(p)}
+                            >
+                                <FindInPageIcon/>
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>

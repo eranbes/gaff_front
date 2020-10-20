@@ -16,7 +16,6 @@ import Typography from "@material-ui/core/Typography";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import SelectInput from "@material-ui/core/Select/SelectInput";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -26,7 +25,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 export const Publisher = ({setRoute, id}) => {
 
     const [publisher, setPublisher] = useState(null)
-    // const [entries, setEntries] = useState([])
 
     const [selectedDomain, setSelectedDomain] = useState('')
     const [newEntry, setNewEntry] = useState('')
@@ -49,7 +47,6 @@ export const Publisher = ({setRoute, id}) => {
 
                     if (res.status === 200) {
                         setPublisher(res.body.name)
-                        // setEntries(res.body.entries)
                         setDomains(res.body.domains)
                     }
 
@@ -58,11 +55,11 @@ export const Publisher = ({setRoute, id}) => {
 
     }, [id])
 
-    const newId = arr => {
+    const newId = () => {
 
         for (let i = 1; i < 100000; i++) {
 
-            if (!arr.find(e => e.id === i)) return i
+            if (!domains.find(e => e.id === i)) return i
 
         }
 
@@ -111,9 +108,10 @@ export const Publisher = ({setRoute, id}) => {
             let name = newDomain
 
             prev.push({
-                id: newId(domains),
+                id: newId(),
                 name,
                 publisher_id: id,
+                entries: [],
                 ns_ads: false,
                 ns_app_ads: true
             })
@@ -146,7 +144,6 @@ export const Publisher = ({setRoute, id}) => {
 
         rest('publishers/' + id, 'PUT', {
             name: publisher,
-            // entries,
             domains
         })
             .then(res => {
@@ -155,7 +152,6 @@ export const Publisher = ({setRoute, id}) => {
 
                 if (res.status === 200) {
                     setPublisher(res.body.name)
-                    // setEntries(res.body.entries)
                     setDomains(res.body.domains)
                 }
 
@@ -173,6 +169,7 @@ export const Publisher = ({setRoute, id}) => {
                 <Grid container
                       direction="row"
                       justify="space-around"
+                      style={{marginBottom: '1rem'}}
                 >
                     <Grid item>
                         <IconButton onClick={() => setRoute('publishers')}>
@@ -189,52 +186,56 @@ export const Publisher = ({setRoute, id}) => {
                     </Grid>
                 </Grid>
 
-                <Grid item>
-                    <Typography variant={"h5"}>Entries</Typography>
-                </Grid>
+                {domains.length > 0
+                    ? <>
+                        <Grid item>
+                            <Typography variant={"h5"}>Entries</Typography>
+                        </Grid>
 
-                <Grid item
-                      style={{margin: '1rem'}}
-                >
-
-                    <FormControl style={{
-                        minWidth: 150,
-                        marginRight: '1rem'
-                    }}>
-                        <InputLabel id="demo-simple-select-label">attach to...</InputLabel>
-                        <Select
-                            value={selectedDomain}
-                            onChange={e => setSelectedDomain(e.target.value)}
+                        <Grid item
+                              style={{margin: '1rem'}}
                         >
-                            {domains.map(d => <MenuItem
-                                value={d.id}
-                                key={'selecteddomainskeycewvv' + d.id}
-                            >{d.name}</MenuItem>)}
-                        </Select>
-                    </FormControl>
 
-                    <TextField label="New entry"
-                               onChange={e => setNewEntry(e.target.value)}
-                               value={newEntry}/>
+                            <FormControl style={{
+                                minWidth: 150,
+                                marginRight: '1rem'
+                            }}>
+                                <InputLabel id="demo-simple-select-label">attach to...</InputLabel>
+                                <Select
+                                    value={selectedDomain}
+                                    onChange={e => setSelectedDomain(e.target.value)}
+                                >
+                                    {domains.map(d => <MenuItem
+                                        value={d.id}
+                                        key={'selecteddomainskeycewvv' + d.id}
+                                    >{d.name}</MenuItem>)}
+                                </Select>
+                            </FormControl>
 
-                    <Button variant="contained" color="primary"
-                            style={{margin: '1rem'}}
-                            disabled={newEntry === '' || !selectedDomain}
-                            onClick={() => addEntry()}
-                    >
-                        add ads
-                    </Button>
+                            <TextField label="New entry"
+                                       onChange={e => setNewEntry(e.target.value)}
+                                       value={newEntry}/>
 
-                    <Button variant="contained" color="primary"
-                            style={{margin: '1rem'}}
-                            disabled={newEntry === '' || !selectedDomain}
-                            onClick={() => addEntry(true)}
-                    >
-                        add app-ads
-                    </Button>
+                            <Button variant="contained" color="primary"
+                                    style={{margin: '1rem'}}
+                                    disabled={newEntry === '' || !selectedDomain}
+                                    onClick={() => addEntry()}
+                            >
+                                add ads
+                            </Button>
+
+                            <Button variant="contained" color="primary"
+                                    style={{margin: '1rem'}}
+                                    disabled={newEntry === '' || !selectedDomain}
+                                    onClick={() => addEntry(true)}
+                            >
+                                add app-ads
+                            </Button>
 
 
-                </Grid>
+                        </Grid>
+                    </>
+                    : null}
 
                 <Grid item>
                     <Typography variant={"h5"}>Domains</Typography>

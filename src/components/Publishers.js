@@ -28,8 +28,9 @@ export const Publishers = ({setRoute, setPublisherId, setPublisher}) => {
         rest('publishers')
             .then(res => {
 
-                if (res.status === 200) setPublishers(res.body)
                 setLoading(false)
+
+                if (res.status === 200) setPublishers(res.body)
 
             })
 
@@ -102,13 +103,16 @@ export const Publishers = ({setRoute, setPublisherId, setPublisher}) => {
                         <ListItemText
                             primary={p.name}
                         />
-                        <ListItemSecondaryAction>
-                            <IconButton edge="end" aria-label="edit"
+                        <ListItemSecondaryAction
+                            style={{padding: '1rem'}}
+                        >
+                            <IconButton edge="end"
                                         onClick={() => editPublisher(p.id)}
                             >
                                 <EditIcon/>
                             </IconButton>
-                            <IconButton edge="end" aria-label="edit"
+
+                            <IconButton edge="end"
                                         onClick={() => crawl(p)}
                             >
                                 <FindInPageIcon/>

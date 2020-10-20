@@ -16,15 +16,24 @@ import Typography from "@material-ui/core/Typography";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import SelectInput from "@material-ui/core/Select/SelectInput";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 
 export const Publisher = ({setRoute, id}) => {
 
     const [publisher, setPublisher] = useState(null)
-    const [entries, setEntries] = useState([])
+    // const [entries, setEntries] = useState([])
+
+    const [selectedDomain, setSelectedDomain] = useState('')
     const [newEntry, setNewEntry] = useState('')
-    const [domains, setDomains] = useState([])
+
     const [newDomain, setNewDomain] = useState('')
+    const [domains, setDomains] = useState([])
+
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
@@ -40,7 +49,7 @@ export const Publisher = ({setRoute, id}) => {
 
                     if (res.status === 200) {
                         setPublisher(res.body.name)
-                        setEntries(res.body.entries)
+                        // setEntries(res.body.entries)
                         setDomains(res.body.domains)
                     }
 
@@ -61,27 +70,37 @@ export const Publisher = ({setRoute, id}) => {
 
     const addEntry = (is_app = false) => {
 
-        setEntries(prev => {
+        setDomains(prev => prev.map(d => {
 
-            let name = newEntry
-            let id = newId(entries)
+            if (d.id === selectedDomain) {
 
-            prev.push({
-                id,
-                name,
-                is_app
-            })
+                if (!d.entries.find(e => e.name === newEntry && is_app === e.is_app)) {
 
-            return prev
-        })
+                    d.entries.push({
+                        name: newEntry,
+                        domain_id: selectedDomain,
+                        is_app
+                    })
 
-        setNewEntry('')
+                }
+
+            }
+
+            return d
+
+        }))
 
     }
 
     const deleteEntry = id => {
 
-        setEntries(prev => prev.filter(e => e.id !== id))
+        setDomains(prev => prev.map(d => {
+
+            d.entries = d.entries.filter(e => e.id !== id)
+
+            return d
+
+        }))
 
     }
 
@@ -90,11 +109,11 @@ export const Publisher = ({setRoute, id}) => {
         setDomains(prev => {
 
             let name = newDomain
-            let id = newId(domains)
 
             prev.push({
-                id,
+                id: newId(domains),
                 name,
+                publisher_id: id,
                 ns_ads: false,
                 ns_app_ads: true
             })
@@ -127,12 +146,18 @@ export const Publisher = ({setRoute, id}) => {
 
         rest('publishers/' + id, 'PUT', {
             name: publisher,
-            entries,
+            // entries,
             domains
         })
             .then(res => {
 
                 setLoading(false)
+
+                if (res.status === 200) {
+                    setPublisher(res.body.name)
+                    // setEntries(res.body.entries)
+                    setDomains(res.body.domains)
+                }
 
             })
 
@@ -142,7 +167,7 @@ export const Publisher = ({setRoute, id}) => {
         ? <LinearProgress/>
         : <>
             <Grid container
-                  style={{marginBottom: '1rem'}}
+                  style={{padding: '1rem'}}
                   direction={"column"} alignItems={"center"} component={Paper}>
 
                 <Grid container
@@ -172,13 +197,29 @@ export const Publisher = ({setRoute, id}) => {
                       style={{margin: '1rem'}}
                 >
 
+                    <FormControl style={{
+                        minWidth: 150,
+                        marginRight: '1rem'
+                    }}>
+                        <InputLabel id="demo-simple-select-label">attach to...</InputLabel>
+                        <Select
+                            value={selectedDomain}
+                            onChange={e => setSelectedDomain(e.target.value)}
+                        >
+                            {domains.map(d => <MenuItem
+                                value={d.id}
+                                key={'selecteddomainskeycewvv' + d.id}
+                            >{d.name}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+
                     <TextField label="New entry"
                                onChange={e => setNewEntry(e.target.value)}
                                value={newEntry}/>
 
                     <Button variant="contained" color="primary"
                             style={{margin: '1rem'}}
-                            disabled={newEntry === ''}
+                            disabled={newEntry === '' || !selectedDomain}
                             onClick={() => addEntry()}
                     >
                         add ads
@@ -186,7 +227,7 @@ export const Publisher = ({setRoute, id}) => {
 
                     <Button variant="contained" color="primary"
                             style={{margin: '1rem'}}
-                            disabled={newEntry === ''}
+                            disabled={newEntry === '' || !selectedDomain}
                             onClick={() => addEntry(true)}
                     >
                         add app-ads
@@ -195,35 +236,6 @@ export const Publisher = ({setRoute, id}) => {
 
                 </Grid>
 
-                {
-                    [
-                        {text: 'ads.txt', is_app: false},
-                        {text: 'app-ads.txt', is_app: true},
-                    ].map(g => <Grid container
-                                     key={'gridadsqwexunrfe' + g.text}
-                                     style={{marginBottom: '1rem'}}
-                                     direction={"column"} alignItems={"center"} component={Paper}
-                    >
-                        <Typography variant={"h6"}>{g.text}</Typography>
-                        <List>
-                            {entries.filter(e => e.is_app === g.is_app)
-                                .map(e => <ListItem key={'listentrfewfcsdkey' + e.name}>
-                                        <ListItemText
-                                            primary={e.name}
-                                        />
-                                        <ListItemSecondaryAction>
-                                            <IconButton edge="end" aria-label="delete"
-                                                        onClick={() => deleteEntry(e.id)}
-                                            >
-                                                <DeleteIcon/>
-                                            </IconButton>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                )}
-                        </List>
-
-                    </Grid>)
-                }
                 <Grid item>
                     <Typography variant={"h5"}>Domains</Typography>
                 </Grid>
@@ -244,27 +256,85 @@ export const Publisher = ({setRoute, id}) => {
                     <List>
                         {domains.map(d => {
 
-                            return <div key={'listdomainskey' + d.id}>
-                                    <TextField
-                                        onChange={e => handleDomain(d.id, 'name', e.target.value)}
-                                        value={d.name}
-                                        style={{marginRight: '1rem'}}
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={!!d.ns_ads}
-                                            onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
-                                        />}
-                                        label="ads.txt"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={!!d.ns_app_ads}
-                                            onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
-                                        />}
-                                        label="app-ads.txt"
-                                    />
-                                </div>
+                                // console.log('domain', d)
+
+                                return <Grid container
+                                             key={'listdomainskey' + d.id}
+                                             component={Paper}
+                                             style={{
+                                                 margin: '1rem',
+                                                 backgroundColor: "#a6d4fa"
+                                             }}
+                                >
+                                    <Grid item
+                                          style={{margin: '1rem'}}
+                                    >
+
+                                        <TextField
+                                            onChange={e => handleDomain(d.id, 'name', e.target.value)}
+                                            value={d.name}
+                                            style={{marginRight: '1rem'}}
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={!!d.ns_ads}
+                                                onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
+                                            />}
+                                            label="ads.txt"
+                                        />
+                                        <FormControlLabel
+                                            control={<Checkbox
+                                                checked={!!d.ns_app_ads}
+                                                onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
+                                            />}
+                                            label="app-ads.txt"
+                                        />
+
+                                    </Grid>
+
+                                    {
+                                        [
+                                            {text: 'ads.txt', is_app: false},
+                                            {text: 'app-ads.txt', is_app: true},
+                                        ].map(g => {
+
+                                                // if (!d.ns_ads && g.is_app) return null
+                                                // if (!d.ns_app_ads && g.is_app) return null
+
+                                                return <Grid container
+                                                             key={'gridadsqwexunrfe' + g.text}
+                                                             style={{marginBottom: '1rem'}}
+                                                             direction={"column"} alignItems={"center"}
+                                                >
+                                                    <Typography variant={"h6"}>{g.text}</Typography>
+                                                    <List>
+                                                        {d.entries.filter(e => {
+
+                                                            // console.log(e)
+
+                                                            return (e.is_app === g.is_app && d.id === e.domain_id)
+                                                        })
+                                                            .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
+                                                                    <ListItemText
+                                                                        primary={e.name}
+                                                                    />
+                                                                    <ListItemSecondaryAction>
+                                                                        <IconButton edge="end" aria-label="delete"
+                                                                                    onClick={() => deleteEntry(e.id)}
+                                                                        >
+                                                                            <DeleteIcon/>
+                                                                        </IconButton>
+                                                                    </ListItemSecondaryAction>
+                                                                </ListItem>
+                                                            )}
+                                                    </List>
+
+                                                </Grid>
+                                            }
+                                        )
+                                    }
+
+                                </Grid>
                             }
                         )}
                     </List>

@@ -22,18 +22,65 @@ export const Reports = ({setRoute}) => {
 
                 setLoading(false)
 
-                if (res.status === 200) setData(res.body)
+                if (res.status === 200) {
+
+                    setData(res.body)
+
+                    console.log(res.body)
+
+                }
 
             })
 
     }, [])
 
-
-    const columns = ["Publisher", "Bundle ids or domains ", "File", "app-ads.txt entries", "ads.txt entries"];
-
+    const columns = [
+        {
+            name: "publisher",
+            label: "Publisher",
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            name: "name",
+            label: "Domain",
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            name: "asset",
+            label: "Bundle ids or domains",
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            name: "app_ads",
+            label: "app-ads.txt entries",
+            options: {
+                filter: true,
+                sort: false,
+                customBodyRender: value => value ? 'true' : 'false'
+            }
+        },
+        {
+            name: "ads",
+            label: "ads.txt entries",
+            options: {
+                filter: true,
+                sort: false,
+            }
+        },
+    ]
 
     const options = {
         // filterType: 'checkbox',
+        selectableRows: 'none'
     };
 
     return loading

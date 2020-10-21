@@ -2,10 +2,11 @@ import React, {useState} from 'react';
 import {Publishers} from "./components/Publishers";
 import {Publisher} from "./components/Publisher";
 import {Crawl} from "./components/Crawl";
+import {Reports} from "./components/Reports";
 
 function App() {
 
-    const [route, setRoute] = useState('publishers');
+    const [route, setRoute] = useState('reports');
     const [publisherId, setPublisherId] = useState(0);
     const [publisher, setPublisher] = useState([]);
 
@@ -15,7 +16,9 @@ function App() {
             ? <Publisher setRoute={setRoute} id={publisherId}/>
             : route === 'crawl'
                 ? <Crawl setRoute={setRoute} publisher={publisher}/>
-                : null
+                : route === 'reports'
+                    ? <Reports setRoute={setRoute}/>
+                    : null
 
 }
 

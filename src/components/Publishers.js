@@ -123,6 +123,14 @@ export const Publishers = ({setRoute, setPublisherId, setPublisher}) => {
             </List>
 
         </Grid>
+
+        <Button variant="contained"
+                color="primary"
+                style={{margin: '1rem'}}
+                onClick={() => setRoute('reports')}
+        >
+            reports
+        </Button>
     </Grid>
 
 }

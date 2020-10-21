@@ -18,25 +18,9 @@ export const Crawl = ({setRoute, publisher}) => {
 
     useEffect(() => {
 
-        // console.log(publisher)
-
-        // publisher.domains.map(d => {
-
-            // if (d.ns_app_ads) {
-            //     fetch(d.name + 'app-ads.txt')
-            //         .then(r => console.log(d.name + 'app-ads.txt', r))
-            // }
-            //
-            // if (d.ns_ads) {
-            //     fetch(d.name + 'ads.txt')
-            //         .then(r => console.log(d.name + 'ads.txt', r))
-            // }
-
-        // })
-
         setLoading(true)
 
-        rest('crawl/' + publisher.id)
+        rest('crawls/' + publisher.id, 'PATCH')
             .then(res => {
 
                 setLoading(false)
@@ -51,43 +35,31 @@ export const Crawl = ({setRoute, publisher}) => {
 
     const renderCells = (row, isApp) => {
 
-        // console.log(row)
-
-        // return isApp
-        //     ? row.ns_app_ads
-        //         ? fetch(row.name + 'app-ads.txt')
-        //             .then(r => {
-        //                 console.log(r.name + 'app-ads.txt', r)
-        //                 return r.ok
-        //                     ? 'exist'
-        //                     : 'not exist'
-        //             })
-        //         : 'no need'
-        //     : row.ns_ads
-        //         ? fetch(row.name + 'ads.txt')
-        //             .then(r => {
-        //                 console.log(r.name + 'ads.txt', r)
-        //                 return r.ok
-        //                     ? 'exist'
-        //                     : 'not exist'
-        //             })
-        //         : 'no need'
-
         return isApp
-            ? row.ns_app_ads
+            ? row.ns_app_ads && row.entries.length > 0
                 ? row.app_ads
-                    ? 'exist'
+                    ? 'parsed'
                     : 'not exist'
                 : 'no need'
-            : row.ns_ads
+            : row.ns_ads && row.entries.length > 0
                 ? row.ads
-                    ? 'exist'
+                    ? 'parsed'
                     : 'not exist'
                 : 'no need'
 
     }
 
     return <>
+
+        <Typography variant="h4"
+                    align="center"
+                    style={{
+                        margin: '1rem'
+                    }}
+        >
+            Publisher: {publisher.name}
+        </Typography>
+
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>

@@ -7,11 +7,20 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 import MUIDataTable from "mui-datatables";
 import rest from "./Rest";
+import ListItem from "@material-ui/core/ListItem";
+import List from "@material-ui/core/List";
+import ListItemText from "@material-ui/core/ListItemText";
 
 export const Reports = ({setRoute}) => {
 
     const [data, setData] = useState()
     const [loading, setLoading] = useState(false)
+
+    const statuses = [
+        {name: 'UNAVAILABLE', color: 'grey'},
+        {name: 'ADDED', color: 'green'},
+        {name: 'DELETED', color: 'red'},
+    ]
 
     useEffect(() => {
 
@@ -33,6 +42,35 @@ export const Reports = ({setRoute}) => {
             })
 
     }, [])
+
+    const customBodyRender = value => {
+
+        if (value.length === 0) return 'N/A'
+
+        return <List>
+            {value.map(e => {
+
+                // console.log(e)
+
+                let status = statuses[e.status_id]
+
+                return <ListItem
+                    style={{
+                        backgroundColor: status.color,
+                        color: 'white',
+                        margin: 0,
+                        padding: 0,
+                    }}
+                >
+                    <ListItemText
+                        primary={e.entry_name}
+                        secondary={status.name + ", add: " + e.created_at + ", upd: " + e.updated_at}
+                    />
+                </ListItem>
+            })}
+        </List>
+
+    }
 
     const columns = [
         {
@@ -65,7 +103,7 @@ export const Reports = ({setRoute}) => {
             options: {
                 filter: true,
                 sort: false,
-                customBodyRender: value => value ? 'true' : 'false'
+                customBodyRender
             }
         },
         {
@@ -74,12 +112,12 @@ export const Reports = ({setRoute}) => {
             options: {
                 filter: true,
                 sort: false,
+                customBodyRender
             }
         },
     ]
 
     const options = {
-        // filterType: 'checkbox',
         selectableRows: 'none'
     };
 

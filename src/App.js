@@ -6,8 +6,8 @@ import {Reports} from "./components/Reports";
 
 function App() {
 
-    const [route, setRoute] = useState('reports');
-    const [publisherId, setPublisherId] = useState(0);
+    const [route, setRoute] = useState('publisher');
+    const [publisherId, setPublisherId] = useState(2);
     const [publisher, setPublisher] = useState([]);
 
     return route === 'publishers'

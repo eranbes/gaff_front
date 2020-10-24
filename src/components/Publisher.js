@@ -28,6 +28,8 @@ export const Publisher = ({setRoute, id}) => {
 
     const [selectedDomain, setSelectedDomain] = useState('')
     const [newEntry, setNewEntry] = useState('')
+    const [newAssetName, setNewAssetName] = useState('')
+    const [newAssetId, setNewAssetId] = useState('')
 
     const [newDomain, setNewDomain] = useState('')
     const [domains, setDomains] = useState([])
@@ -55,13 +57,55 @@ export const Publisher = ({setRoute, id}) => {
 
     }, [id])
 
-    const newId = () => {
+    const newId = (isNotDomain = false) => {
 
         for (let i = 1; i < 100000; i++) {
 
-            if (!domains.find(e => e.id === i)) return i
+            if (isNotDomain) {
 
+                if (domains.find(d => d.assets.find(a => a.id === i) || d.entries.find(e => e.id === i))) {
+                    console.log('true', i)
+                } else {
+                    console.log('false', i)
+                    return i
+                }
+                if (i > 100) return i
+
+            } else {
+
+                if (!domains.find(e => e.id === i)) return i
+
+            }
         }
+
+    }
+
+    const addAsset = () => {
+
+        setDomains(prev => prev.map(d => {
+
+            if (d.id === selectedDomain) {
+
+                console.log(d)
+
+                if (!d.assets.find(a => a.asset_name === newAssetName && a.asset_id === newAssetId)) {
+
+                    d.assets.push({
+                        id: newId(true),
+                        asset_name: newAssetName,
+                        asset_id: newAssetId
+                    })
+
+                    setNewAssetName('')
+                    setNewAssetId('')
+
+                }
+
+            }
+
+            return d
+
+        }))
 
     }
 
@@ -79,6 +123,8 @@ export const Publisher = ({setRoute, id}) => {
                         is_app
                     })
 
+                    setNewEntry('')
+
                 }
 
             }
@@ -89,11 +135,13 @@ export const Publisher = ({setRoute, id}) => {
 
     }
 
-    const deleteEntry = id => {
+    const deleteById = (domain_id, index, id) => {
 
         setDomains(prev => prev.map(d => {
 
-            d.entries = d.entries.filter(e => e.id !== id)
+            if (d.id === domain_id) {
+                d[index] = d[index].filter(a => a.id !== id)
+            }
 
             return d
 
@@ -111,6 +159,7 @@ export const Publisher = ({setRoute, id}) => {
                 id: newId(),
                 name,
                 publisher_id: id,
+                assets: [],
                 entries: [],
                 ns_ads: false,
                 ns_app_ads: true
@@ -182,16 +231,27 @@ export const Publisher = ({setRoute, id}) => {
                                    value={publisher}
                         />
                     </Grid>
-                    <Grid item>
-                    </Grid>
+                    <Grid item/>
+                </Grid>
+
+                <Grid item
+                      style={{margin: '1rem'}}
+                >
+                    <TextField label="New domain"
+                               onChange={e => setNewDomain(e.target.value)}
+                               value={newDomain}/>
+
+                    <Button variant="contained" color="primary"
+                            style={{margin: '1rem'}}
+                            onClick={() => addDomain()}
+                            disabled={newDomain === ''}
+                    >
+                        add domain
+                    </Button>
                 </Grid>
 
                 {domains.length > 0
                     ? <>
-                        <Grid item>
-                            <Typography variant={"h5"}>Entries</Typography>
-                        </Grid>
-
                         <Grid item
                               style={{margin: '1rem'}}
                         >
@@ -200,7 +260,7 @@ export const Publisher = ({setRoute, id}) => {
                                 minWidth: 150,
                                 marginRight: '1rem'
                             }}>
-                                <InputLabel id="demo-simple-select-label">attach to...</InputLabel>
+                                <InputLabel>attach to...</InputLabel>
                                 <Select
                                     value={selectedDomain}
                                     onChange={e => setSelectedDomain(e.target.value)}
@@ -234,111 +294,127 @@ export const Publisher = ({setRoute, id}) => {
 
 
                         </Grid>
+
+                        <Grid item
+                              style={{margin: '1rem'}}
+                        >
+                            <TextField label="New Asset Name"
+                                       onChange={e => setNewAssetName(e.target.value)}
+                                       value={newAssetName}/>
+
+                            <TextField label="New Asset ID"
+                                       style={{
+                                           marginLeft: '1rem',
+                                           marginRight: '1rem'
+                                       }}
+                                       onChange={e => setNewAssetId(e.target.value)}
+                                       value={newAssetId}/>
+
+                            <Button variant="contained" color="primary"
+                                    disabled={!newAssetName || !newAssetId || !selectedDomain}
+                                    onClick={() => addAsset()}
+                            >
+                                add asset
+                            </Button>
+
+                        </Grid>
                     </>
                     : null}
 
                 <Grid item>
-                    <Typography variant={"h5"}>Domains</Typography>
-                </Grid>
-                <Grid item>
 
-                    <TextField label="New domain"
-                               onChange={e => setNewDomain(e.target.value)}
-                               value={newDomain}/>
+                    {domains.map(d => {
 
-                    <Button variant="contained" color="primary"
-                            style={{margin: '1rem'}}
-                            onClick={() => addDomain()}
-                            disabled={newDomain === ''}
-                    >
-                        add domain
-                    </Button>
+                        console.log(d)
+                        console.log(typeof d.entries, d.entries.length)
 
-                    <List>
-                        {domains.map(d => {
-
-                                // console.log('domain', d)
-
-                                return <Grid container
-                                             key={'listdomainskey' + d.id}
-                                             component={Paper}
-                                             style={{
-                                                 margin: '1rem',
-                                                 backgroundColor: "#a6d4fa"
-                                             }}
+                        return <Grid container
+                                  key={'listdomainskey' + d.id}
+                                  component={Paper}
+                                  style={{
+                                      margin: '1rem',
+                                      backgroundColor: "#a6d4fa"
+                                  }}
+                            >
+                                <Grid item
+                                      style={{margin: '1rem'}}
                                 >
-                                    <Grid item
-                                          style={{margin: '1rem'}}
-                                    >
 
-                                        <TextField
-                                            onChange={e => handleDomain(d.id, 'name', e.target.value)}
-                                            value={d.name}
-                                            style={{marginRight: '1rem'}}
-                                        />
-                                        <FormControlLabel
-                                            control={<Checkbox
-                                                checked={!!d.ns_ads}
-                                                onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
-                                            />}
-                                            label="ads.txt"
-                                        />
-                                        <FormControlLabel
-                                            control={<Checkbox
-                                                checked={!!d.ns_app_ads}
-                                                onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
-                                            />}
-                                            label="app-ads.txt"
-                                        />
-
-                                    </Grid>
-
-                                    {
-                                        [
-                                            {text: 'ads.txt', is_app: false},
-                                            {text: 'app-ads.txt', is_app: true},
-                                        ].map(g => {
-
-                                                // if (!d.ns_ads && g.is_app) return null
-                                                // if (!d.ns_app_ads && g.is_app) return null
-
-                                                return <Grid container
-                                                             key={'gridadsqwexunrfe' + g.text}
-                                                             style={{marginBottom: '1rem'}}
-                                                             direction={"column"} alignItems={"center"}
-                                                >
-                                                    <Typography variant={"h6"}>{g.text}</Typography>
-                                                    <List>
-                                                        {d.entries.filter(e => {
-
-                                                            // console.log(e)
-
-                                                            return (e.is_app === g.is_app && d.id === e.domain_id)
-                                                        })
-                                                            .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
-                                                                    <ListItemText
-                                                                        primary={e.name}
-                                                                    />
-                                                                    <ListItemSecondaryAction>
-                                                                        <IconButton edge="end" aria-label="delete"
-                                                                                    onClick={() => deleteEntry(e.id)}
-                                                                        >
-                                                                            <DeleteIcon/>
-                                                                        </IconButton>
-                                                                    </ListItemSecondaryAction>
-                                                                </ListItem>
-                                                            )}
-                                                    </List>
-
-                                                </Grid>
-                                            }
-                                        )
-                                    }
+                                    <TextField
+                                        onChange={e => handleDomain(d.id, 'name', e.target.value)}
+                                        value={d.name}
+                                        style={{marginRight: '1rem'}}
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={!!d.ns_ads}
+                                            onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
+                                        />}
+                                        label="ads.txt"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={!!d.ns_app_ads}
+                                            onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
+                                        />}
+                                        label="app-ads.txt"
+                                    />
 
                                 </Grid>
-                            }
-                        )}
-                    </List>
+
+                                {typeof d.assets === 'object' && d.assets.length > 0
+                                    ? <Grid item
+                                            style={{margin: '1rem'}}
+                                    >
+                                        <Typography variant={"h6"}>Assets</Typography>
+                                        <List>
+                                            {d.assets.map(a => <ListItem
+                                                key={"listitforassetscildioubrgrgv" + a.id}
+                                            >
+                                                <ListItemText
+                                                    primary={a.asset_name + ' ' + a.asset_id}
+                                                />
+                                                <IconButton edge="end"
+                                                            onClick={() => deleteById(d.id, 'assets', a.id)}
+                                                >
+                                                    <DeleteIcon/>
+                                                </IconButton>
+                                            </ListItem>)}
+                                        </List>
+                                    </Grid>
+                                    : null}
+
+                                {typeof d.entries === 'object' && d.entries.length > 0
+                                    ? [
+                                        {text: 'ads.txt', is_app: false},
+                                        {text: 'app-ads.txt', is_app: true},
+                                    ].map(g => <Grid item
+                                                     key={"jgicgjqhcvucgi31" + g.text}
+                                                     style={{margin: '1rem'}}
+                                    >
+                                        <Typography variant={"h6"}>{g.text}</Typography>
+                                        <List>
+                                            {d.entries.filter(e => e.is_app === g.is_app && d.id === e.domain_id)
+                                                .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
+                                                        <ListItemText
+                                                            primary={e.name}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end"
+                                                                        onClick={() => deleteById(d.id, 'entries', e.id)}
+                                                            >
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+                                        </List>
+                                    </Grid>)
+                                    : null}
+
+                            </Grid>
+                        }
+                    )}
 
                 </Grid>
 
@@ -364,7 +440,7 @@ export const Publisher = ({setRoute, id}) => {
                         color="primary"
                         style={{margin: '1rem'}}
                         onClick={() => savePublisher()}
-                        disabled={publisher === ''}
+                        disabled={!publisher || !!domains.find(d => !d.name)}
                     >
                         save
                     </Button>

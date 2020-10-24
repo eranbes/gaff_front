@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
-import {Paper, Typography} from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
@@ -35,13 +34,21 @@ export const Reports = ({setRoute}) => {
 
                     setData(res.body)
 
-                    console.log(res.body)
+                    // console.log(res.body)
 
                 }
 
             })
 
     }, [])
+
+    const assetsRender = value => value.length === 0
+        ? 'not exists'
+        : <List>
+            {value.map(a => <ListItem key={"assetskeyfowqerg" + a.id}>
+                {a.asset_name}
+            </ListItem>)}
+        </List>
 
     const customBodyRender = value => {
 
@@ -50,11 +57,10 @@ export const Reports = ({setRoute}) => {
         return <List>
             {value.map(e => {
 
-                // console.log(e)
-
                 let status = statuses[e.status_id]
 
                 return <ListItem
+                    key={"entrieskeyforcriwuerbkver" + e.id}
                     style={{
                         backgroundColor: status.color,
                         color: 'white',
@@ -90,11 +96,12 @@ export const Reports = ({setRoute}) => {
             }
         },
         {
-            name: "asset",
-            label: "Bundle ids or domains",
+            name: "assets",
+            label: "assets name",
             options: {
                 filter: true,
                 sort: true,
+                customBodyRender: assetsRender
             }
         },
         {

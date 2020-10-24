@@ -27,7 +27,13 @@ const fetchPost = (url, method = 'GET', data = null) => {
             };
             return res;
         })
-        .then(res => res.json())
+        .then(res => {
+            try {
+                return res.json()
+            } catch (e) {
+                return null
+            }
+        })
         .then(res => {
             response.body = res;
             return response;

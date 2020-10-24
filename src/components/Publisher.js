@@ -57,25 +57,24 @@ export const Publisher = ({setRoute, id}) => {
 
     }, [id])
 
-    const newId = (isNotDomain = false) => {
+    const newChildId = (domain) => {
 
         for (let i = 1; i < 100000; i++) {
 
-            if (isNotDomain) {
-
-                if (domains.find(d => d.assets.find(a => a.id === i) || d.entries.find(e => e.id === i))) {
-                    console.log('true', i)
-                } else {
-                    console.log('false', i)
-                    return i
-                }
-                if (i > 100) return i
-
-            } else {
-
-                if (!domains.find(e => e.id === i)) return i
-
+            if (!(domain.assets.find(a => a.id === i) || domain.entries.find(e => e.id === i))) {
+                return i
             }
+
+        }
+
+    }
+
+    const newId = () => {
+
+        for (let i = 1; i < 100000; i++) {
+
+            if (!domains.find(e => e.id === i)) return i
+
         }
 
     }
@@ -91,9 +90,10 @@ export const Publisher = ({setRoute, id}) => {
                 if (!d.assets.find(a => a.asset_name === newAssetName && a.asset_id === newAssetId)) {
 
                     d.assets.push({
-                        id: newId(true),
+                        id: newChildId(d),
                         asset_name: newAssetName,
-                        asset_id: newAssetId
+                        asset_id: newAssetId,
+                        domain_id: selectedDomain,
                     })
 
                     setNewAssetName('')
@@ -118,6 +118,7 @@ export const Publisher = ({setRoute, id}) => {
                 if (!d.entries.find(e => e.name === newEntry && is_app === e.is_app)) {
 
                     d.entries.push({
+                        id: newChildId(d),
                         name: newEntry,
                         domain_id: selectedDomain,
                         is_app
@@ -325,8 +326,8 @@ export const Publisher = ({setRoute, id}) => {
 
                     {domains.map(d => {
 
-                        console.log(d)
-                        console.log(typeof d.entries, d.entries.length)
+                        // console.log(d)
+                        // console.log(typeof d.entries, d.entries.length)
 
                         return <Grid container
                                   key={'listdomainskey' + d.id}

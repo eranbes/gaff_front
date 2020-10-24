@@ -20,6 +20,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import Box from "@material-ui/core/Box";
 
 
 export const Publisher = ({setRoute, id}) => {
@@ -212,28 +213,20 @@ export const Publisher = ({setRoute, id}) => {
     return publisher === null
         ? <LinearProgress/>
         : <>
+            <Typography variant="h5" style={{margin: '1rem'}}>
+                Publisher:
+            <TextField variant="outlined"
+                       style={{marginLeft: '1rem'}}
+                       onChange={e => setPublisher(e.target.value)}
+                       value={publisher}
+            />
+            </Typography>
+
             <Grid container
                   style={{padding: '1rem'}}
-                  direction={"column"} alignItems={"center"} component={Paper}>
+                  direction={"column"}
+                  alignItems={"center"} >
 
-                <Grid container
-                      direction="row"
-                      justify="space-around"
-                      style={{marginBottom: '1rem'}}
-                >
-                    <Grid item>
-                        <IconButton onClick={() => setRoute('publishers')}>
-                            <ArrowBackIcon/>
-                        </IconButton>
-                    </Grid>
-                    <Grid item>
-                        <TextField label="Publisher"
-                                   onChange={e => setPublisher(e.target.value)}
-                                   value={publisher}
-                        />
-                    </Grid>
-                    <Grid item/>
-                </Grid>
 
                 <Grid item
                       style={{margin: '1rem'}}
@@ -326,16 +319,14 @@ export const Publisher = ({setRoute, id}) => {
 
                     {domains.map(d => {
 
-                        // console.log(d)
-                        // console.log(typeof d.entries, d.entries.length)
-
-                        return <Grid container
+                            return <Grid container
                                   key={'listdomainskey' + d.id}
-                                  component={Paper}
-                                  style={{
-                                      margin: '1rem',
-                                      backgroundColor: "#a6d4fa"
-                                  }}
+                                         direction="row"
+                                         // component={}
+                                         style={{
+                                             margin: '1rem',
+                                             backgroundColor: "#a6d4fa"
+                                         }}
                             >
                                 <Grid item
                                       style={{margin: '1rem'}}
@@ -385,34 +376,35 @@ export const Publisher = ({setRoute, id}) => {
                                     </Grid>
                                     : null}
 
-                                {typeof d.entries === 'object' && d.entries.length > 0
-                                    ? [
-                                        {text: 'ads.txt', is_app: false},
-                                        {text: 'app-ads.txt', is_app: true},
-                                    ].map(g => <Grid item
-                                                     key={"jgicgjqhcvucgi31" + g.text}
-                                                     style={{margin: '1rem'}}
-                                    >
-                                        <Typography variant={"h6"}>{g.text}</Typography>
-                                        <List>
-                                            {d.entries.filter(e => e.is_app === g.is_app && d.id === e.domain_id)
-                                                .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
-                                                        <ListItemText
-                                                            primary={e.name}
-                                                        />
-                                                        <ListItemSecondaryAction>
-                                                            <IconButton edge="end"
-                                                                        onClick={() => deleteById(d.id, 'entries', e.id)}
-                                                            >
-                                                                <DeleteIcon/>
-                                                            </IconButton>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>
-                                                )}
-                                        </List>
-                                    </Grid>)
-                                    : null}
-
+                                <Grid item
+                                      style={{margin: '1rem'}}
+                                >
+                                    {typeof d.entries === 'object' && d.entries.length > 0
+                                        ? [
+                                            {text: 'ads.txt', is_app: false},
+                                            {text: 'app-ads.txt', is_app: true},
+                                        ].map(g => <List
+                                                key={"jgicgjqhcvucgi31" + g.text}
+                                            >
+                                                <Typography variant={"h6"}>{g.text}</Typography>
+                                                {d.entries.filter(e => e.is_app === g.is_app && d.id === e.domain_id)
+                                                    .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
+                                                            <ListItemText
+                                                                primary={e.name}
+                                                            />
+                                                            <ListItemSecondaryAction>
+                                                                <IconButton edge="end"
+                                                                            onClick={() => deleteById(d.id, 'entries', e.id)}
+                                                                >
+                                                                    <DeleteIcon/>
+                                                                </IconButton>
+                                                            </ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    )}
+                                            </List>
+                                        )
+                                        : null}
+                                </Grid>
                             </Grid>
                         }
                     )}

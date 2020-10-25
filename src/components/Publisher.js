@@ -1,11 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import Grid from "@material-ui/core/Grid";
-import {Paper} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 
 import rest from './Rest'
 import Button from "@material-ui/core/Button";
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -17,7 +15,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Box from "@material-ui/core/Box";
@@ -27,7 +24,7 @@ export const Publisher = ({setRoute, id}) => {
 
     const [publisher, setPublisher] = useState(null)
 
-    const [selectedDomain, setSelectedDomain] = useState('')
+    const [selectedDomain, setSelectedDomain] = useState(0)
     const [newEntry, setNewEntry] = useState('')
     const [newAssetName, setNewAssetName] = useState('')
     const [newAssetId, setNewAssetId] = useState('')
@@ -213,203 +210,270 @@ export const Publisher = ({setRoute, id}) => {
     return publisher === null
         ? <LinearProgress/>
         : <>
-            <Typography variant="h5" style={{margin: '1rem'}}>
-                Publisher:
-            <TextField variant="outlined"
-                       style={{marginLeft: '1rem'}}
-                       onChange={e => setPublisher(e.target.value)}
-                       value={publisher}
-            />
-            </Typography>
-
             <Grid container
-                  style={{padding: '1rem'}}
-                  direction={"column"}
-                  alignItems={"center"} >
-
+                  direction="column"
+            >
 
                 <Grid item
                       style={{margin: '1rem'}}
                 >
-                    <TextField label="New domain"
-                               onChange={e => setNewDomain(e.target.value)}
-                               value={newDomain}/>
+                    <span style={{
+                        fontSize: '2rem',
+                        margin: '1rem',
+                    }}>
+                        Publisher:
+                    </span>
+                    <TextField variant="outlined"
+                               onChange={e => setPublisher(e.target.value)}
+                               value={publisher}
+                    />
+                </Grid>
+                Domains
+                <Grid item>
+                    <Box border={2}>
+                        <Grid container
+                              spacing={2}
+                        >
+                            <Grid item xs={5}
+                                  style={{margin: '1rem'}}
+                            >
+                                <TextField label="Add new domain"
+                                           variant="outlined"
+                                           onChange={e => setNewDomain(e.target.value)}
+                                           value={newDomain}/>
 
-                    <Button variant="contained" color="primary"
-                            style={{margin: '1rem'}}
-                            onClick={() => addDomain()}
-                            disabled={newDomain === ''}
-                    >
-                        add domain
-                    </Button>
+                                <Button variant="contained"
+                                        color="primary"
+                                        style={{
+                                            margin: '1rem',
+                                            backgroundColor: "#085394"
+                                        }}
+                                        onClick={() => addDomain()}
+                                        disabled={newDomain === ''}
+                                >
+                                    add domain
+                                </Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                                {"Domains for " + publisher}
+                                <Box border={1}
+                                     style={{
+                                         margin: '1rem',
+                                         alignSelf: 'center'
+                                     }}
+                                >
+                                    <List>
+                                        {domains.map(d => <ListItem key={"listdonmjsbidgv" + d.id}>
+                                            <ListItemText
+                                                primary={d.name}
+                                            />
+                                        </ListItem>)}
+                                    </List>
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </Box>
                 </Grid>
 
                 {domains.length > 0
-                    ? <>
-                        <Grid item
-                              style={{margin: '1rem'}}
-                        >
-
-                            <FormControl style={{
-                                minWidth: 150,
-                                marginRight: '1rem'
-                            }}>
-                                <InputLabel>attach to...</InputLabel>
-                                <Select
-                                    value={selectedDomain}
-                                    onChange={e => setSelectedDomain(e.target.value)}
-                                >
-                                    {domains.map(d => <MenuItem
-                                        value={d.id}
-                                        key={'selecteddomainskeycewvv' + d.id}
-                                    >{d.name}</MenuItem>)}
-                                </Select>
-                            </FormControl>
-
-                            <TextField label="New entry"
-                                       onChange={e => setNewEntry(e.target.value)}
-                                       value={newEntry}/>
-
-                            <Button variant="contained" color="primary"
-                                    style={{margin: '1rem'}}
-                                    disabled={newEntry === '' || !selectedDomain}
-                                    onClick={() => addEntry()}
+                    ? <Grid>
+                        ads.txt/app-ads.txt/assets
+                        <Box border={2}>
+                            <Grid container
+                                  direction="column"
+                                  style={{margin: '1rem'}}
+                                  spacing={2}
                             >
-                                add ads
-                            </Button>
-
-                            <Button variant="contained" color="primary"
-                                    style={{margin: '1rem'}}
-                                    disabled={newEntry === '' || !selectedDomain}
-                                    onClick={() => addEntry(true)}
-                            >
-                                add app-ads
-                            </Button>
-
-
-                        </Grid>
-
-                        <Grid item
-                              style={{margin: '1rem'}}
-                        >
-                            <TextField label="New Asset Name"
-                                       onChange={e => setNewAssetName(e.target.value)}
-                                       value={newAssetName}/>
-
-                            <TextField label="New Asset ID"
-                                       style={{
-                                           marginLeft: '1rem',
-                                           marginRight: '1rem'
-                                       }}
-                                       onChange={e => setNewAssetId(e.target.value)}
-                                       value={newAssetId}/>
-
-                            <Button variant="contained" color="primary"
-                                    disabled={!newAssetName || !newAssetId || !selectedDomain}
-                                    onClick={() => addAsset()}
-                            >
-                                add asset
-                            </Button>
-
-                        </Grid>
-                    </>
-                    : null}
-
-                <Grid item>
-
-                    {domains.map(d => {
-
-                            return <Grid container
-                                  key={'listdomainskey' + d.id}
-                                         direction="row"
-                                         // component={}
-                                         style={{
-                                             margin: '1rem',
-                                             backgroundColor: "#a6d4fa"
-                                         }}
-                            >
-                                <Grid item
-                                      style={{margin: '1rem'}}
-                                >
-
-                                    <TextField
-                                        onChange={e => handleDomain(d.id, 'name', e.target.value)}
-                                        value={d.name}
-                                        style={{marginRight: '1rem'}}
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={!!d.ns_ads}
-                                            onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
-                                        />}
-                                        label="ads.txt"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={!!d.ns_app_ads}
-                                            onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
-                                        />}
-                                        label="app-ads.txt"
-                                    />
-
+                                <Grid item>
+                                    <FormControl
+                                        variant="outlined"
+                                        style={{width: '50%'}}
+                                    >
+                                        {/*<InputLabel>Select Domain To Attach To</InputLabel>*/}
+                                        <Select
+                                            value={selectedDomain}
+                                            onChange={e => setSelectedDomain(e.target.value)}
+                                        >
+                                            <MenuItem value={0}>Select Domain To Attach To</MenuItem>
+                                            {domains.map(d => <MenuItem
+                                                value={d.id}
+                                                key={'selecteddomainskeycewvv' + d.id}
+                                            >{d.name}</MenuItem>)}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
 
-                                {typeof d.assets === 'object' && d.assets.length > 0
-                                    ? <Grid item
-                                            style={{margin: '1rem'}}
-                                    >
-                                        <Typography variant={"h6"}>Assets</Typography>
-                                        <List>
-                                            {d.assets.map(a => <ListItem
-                                                key={"listitforassetscildioubrgrgv" + a.id}
-                                            >
-                                                <ListItemText
-                                                    primary={a.asset_name + ' ' + a.asset_id}
-                                                />
-                                                <IconButton edge="end"
-                                                            onClick={() => deleteById(d.id, 'assets', a.id)}
-                                                >
-                                                    <DeleteIcon/>
-                                                </IconButton>
-                                            </ListItem>)}
-                                        </List>
-                                    </Grid>
-                                    : null}
+                                <Grid item>
+                                    <Grid container>
+                                        <Grid item xs={4}>
+                                            <TextField label="Your txt Entry"
+                                                       variant="outlined"
+                                                       fullWidth
+                                                       onChange={e => setNewEntry(e.target.value)}
+                                                       value={newEntry}/>
+                                        </Grid>
 
-                                <Grid item
-                                      style={{margin: '1rem'}}
-                                >
-                                    {typeof d.entries === 'object' && d.entries.length > 0
-                                        ? [
-                                            {text: 'ads.txt', is_app: false},
-                                            {text: 'app-ads.txt', is_app: true},
-                                        ].map(g => <List
-                                                key={"jgicgjqhcvucgi31" + g.text}
+                                        <Grid item>
+                                            <Button variant="contained" color="primary"
+                                                    style={{
+                                                        margin: '1rem',
+                                                        backgroundColor: "#009E0F"
+                                                    }}
+                                                    disabled={newEntry === '' || !selectedDomain}
+                                                    onClick={() => addEntry()}
                                             >
-                                                <Typography variant={"h6"}>{g.text}</Typography>
-                                                {d.entries.filter(e => e.is_app === g.is_app && d.id === e.domain_id)
-                                                    .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
-                                                            <ListItemText
-                                                                primary={e.name}
-                                                            />
-                                                            <ListItemSecondaryAction>
-                                                                <IconButton edge="end"
-                                                                            onClick={() => deleteById(d.id, 'entries', e.id)}
-                                                                >
-                                                                    <DeleteIcon/>
-                                                                </IconButton>
-                                                            </ListItemSecondaryAction>
-                                                        </ListItem>
-                                                    )}
-                                            </List>
-                                        )
-                                        : null}
+                                                add to ads.txt
+                                            </Button>
+                                        </Grid>
+
+                                        <Grid item>
+                                            <Button variant="contained" color="primary"
+                                                    style={{
+                                                        margin: '1rem',
+                                                        backgroundColor: "#009E0F"
+                                                    }}
+                                                    disabled={newEntry === '' || !selectedDomain}
+                                                    onClick={() => addEntry(true)}
+                                            >
+                                                add to app-ads.txt
+                                            </Button>
+                                        </Grid>
+
+                                    </Grid>
+                                </Grid>
+
+                                <Grid item>
+
+                                    <Grid container spacing={1}>
+                                        <Grid item xs={4}>
+                                            <TextField label="Asset Name"
+                                                       variant="outlined"
+                                                       fullWidth
+                                                       onChange={e => setNewAssetName(e.target.value)}
+                                                       value={newAssetName}/>
+                                        </Grid>
+
+                                        <Grid item xs={4}>
+                                            <TextField label="Asset ID"
+                                                       variant="outlined"
+                                                       fullWidth
+                                                       onChange={e => setNewAssetId(e.target.value)}
+                                                       value={newAssetId}/>
+                                        </Grid>
+
+                                        <Grid item>
+                                            <Button variant="contained"
+                                                    color="primary"
+                                                    style={{
+                                                        margin: '1rem',
+                                                        backgroundColor: "#9900ff"
+                                                    }}
+                                                    disabled={!newAssetName || !newAssetId || !selectedDomain}
+                                                    onClick={() => addAsset()}
+                                            >
+                                                add to assets
+                                            </Button>
+                                        </Grid>
+
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        }
-                    )}
+                        </Box>
 
-                </Grid>
+                    </Grid>
+                    : null}
+
+                {domains.map(d => <Grid
+                    key={'listdomainskey' + d.id}
+                    style={{marginTop: '1rem'}}>
+                    <Box border={2}
+                         style={{
+                             backgroundColor: "#B2D4E5"
+                         }}
+                    >
+                        <Grid container justify="space-around">
+                            <Grid item xs={2}
+                                  style={{margin: '1rem'}}
+                            >
+                                <Typography variant={"h6"}>Domain</Typography>
+                                <TextField
+                                    onChange={e => handleDomain(d.id, 'name', e.target.value)}
+                                    value={d.name}
+                                    // style={{marginRight: '1rem'}}
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        checked={!!d.ns_ads}
+                                        onChange={e => handleDomain(d.id, 'ns_ads', e.target.checked)}
+                                    />}
+                                    label="ads.txt"
+                                />
+                                <FormControlLabel
+                                    control={<Checkbox
+                                        checked={!!d.ns_app_ads}
+                                        onChange={e => handleDomain(d.id, 'ns_app_ads', e.target.checked)}
+                                    />}
+                                    label="app-ads.txt"
+                                />
+
+                            </Grid>
+                            <Grid item xs={4}
+                                  style={{margin: '1rem'}}
+                            >
+                                <Typography variant={"h6"}>Assets</Typography>
+
+                                {typeof d.assets === 'object' && d.assets.length > 0
+                                    ?
+                                    <List>
+                                        {d.assets.map(a => <ListItem
+                                            key={"listitforassetscildioubrgrgv" + a.id}
+                                        >
+                                            <ListItemText
+                                                primary={a.asset_name + ' ' + a.asset_id}
+                                            />
+                                            <IconButton edge="end"
+                                                        onClick={() => deleteById(d.id, 'assets', a.id)}
+                                            >
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </ListItem>)}
+                                    </List>
+                                    : null}
+
+                            </Grid>
+
+                            <Grid item xs={5}
+                                  style={{margin: '1rem'}}
+                            >
+                                {typeof d.entries === 'object' && d.entries.length > 0
+                                    ? [
+                                        {text: 'ads.txt', is_app: false},
+                                        {text: 'app-ads.txt', is_app: true},
+                                    ].map(g => <List
+                                            key={"jgicgjqhcvucgi31" + g.text}
+                                        >
+                                            <Typography variant={"h6"}>{g.text}</Typography>
+                                            {d.entries.filter(e => e.is_app === g.is_app && d.id === e.domain_id)
+                                                .map(e => <ListItem key={'listentrfewfcsdkey' + e.name + e.id}>
+                                                        <ListItemText
+                                                            primary={e.name}
+                                                        />
+                                                        <ListItemSecondaryAction>
+                                                            <IconButton edge="end"
+                                                                        onClick={() => deleteById(d.id, 'entries', e.id)}
+                                                            >
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </ListItemSecondaryAction>
+                                                    </ListItem>
+                                                )}
+                                        </List>
+                                    )
+                                    : null}
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Grid>)}
 
             </Grid>
 

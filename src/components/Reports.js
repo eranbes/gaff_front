@@ -108,8 +108,6 @@ export const Reports = ({setRoute}) => {
             name: "app_ads",
             label: "app-ads.txt entries",
             options: {
-                filter: true,
-                sort: false,
                 customBodyRender
             }
         },
@@ -117,15 +115,14 @@ export const Reports = ({setRoute}) => {
             name: "ads",
             label: "ads.txt entries",
             options: {
-                filter: true,
-                sort: false,
                 customBodyRender
             }
         },
     ]
 
     const options = {
-        selectableRows: 'none'
+        selectableRows: 'none',
+        confirmFilters: true,
     };
 
     return loading

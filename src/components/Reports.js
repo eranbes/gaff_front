@@ -156,7 +156,7 @@ export const Reports = ({setRoute}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [loading, setLoading] = useState(false)
-    const [isFSO, setFSO] = useState(true)
+    const [isFSO, setFSO] = useState(false)
     const [filterPublisher, setFilterPublisher] = useState('')
     const [filterDomain, setFilterDomain] = useState('')
     const [filterAsset, setFilterAsset] = useState('')
@@ -175,7 +175,7 @@ export const Reports = ({setRoute}) => {
 
                     setRows(res.body)
 
-                    console.log(res.body)
+                    // console.log(res.body)
 
                 }
 
@@ -222,7 +222,7 @@ export const Reports = ({setRoute}) => {
                                 <MenuItem value={''}>None</MenuItem>
                                 {rows.map(r => r.publisher)
                                     .filter((p, i, self) => self.indexOf(p) === i)
-                                    .map(p => <MenuItem value={p}>
+                                    .map(p => <MenuItem value={p} key={"hcbehvsjehcve" + p}>
                                         {p}
                                     </MenuItem>)}
                             </Select>
@@ -240,7 +240,7 @@ export const Reports = ({setRoute}) => {
                                 <MenuItem value={''}>None</MenuItem>
                                 {rows.map(r => r.name)
                                     .filter((d, i, self) => self.indexOf(d) === i)
-                                    .map(d => <MenuItem value={d}>
+                                    .map(d => <MenuItem value={d} key={"uiqgdiquhweiwcvj" + d}>
                                         {d}
                                     </MenuItem>)}
                             </Select>
@@ -260,7 +260,7 @@ export const Reports = ({setRoute}) => {
                                     .filter(a => a.length > 0)
                                     .map(a => a.map(a => a.asset_name)))
                                     .filter((a, i, self) => self.indexOf(a) === i)
-                                    .map(a => <MenuItem value={a}>
+                                    .map(a => <MenuItem value={a} key={"ecgnqweixqguyqgnq" + a}>
                                         {a}
                                     </MenuItem>)}
                             </Select>
@@ -297,27 +297,23 @@ export const Reports = ({setRoute}) => {
 
     const isNeedDisplay = row => {
 
-        let needDisplay = true;
+        if (filterPublisher && filterPublisher !== row.publisher) return false
 
-        if (filterPublisher) {
-
-            needDisplay = filterPublisher === row.publisher
-
-        }
-
-        if (filterDomain) {
-
-            needDisplay = filterDomain === row.name
-
-        }
+        if (filterDomain && filterDomain !== row.name) return false
 
         if (filterAsset) {
 
-            needDisplay = Boolean(row.assets.find(a => filterAsset === a.asset_name))
+            if (filterAsset === 'not exists' && row.assets.length === 0) {
+
+                return true
+
+            }
+
+            return Boolean(row.assets.find(a => filterAsset === a.asset_name))
 
         }
 
-        return needDisplay
+        return true
 
     }
 

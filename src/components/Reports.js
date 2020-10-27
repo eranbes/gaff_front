@@ -26,6 +26,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
+import Button from "@material-ui/core/Button";
 
 
 function descendingComparator(a, b, orderBy) {
@@ -407,6 +408,15 @@ export const Reports = ({setRoute}) => {
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                 />
             </Paper>
+
+            <Button
+                variant="contained"
+                style={{margin: '1rem'}}
+                onClick={() => setRoute('publishers')}
+            >
+                back
+            </Button>
+
         </div>
     );
 }

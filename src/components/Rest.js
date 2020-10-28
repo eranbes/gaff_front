@@ -19,7 +19,7 @@ const fetchPost = (url, method = 'GET', data = null) => {
     }
     if (data) init.body = JSON.stringify(data);
 
-    return fetch(SERVER + '/' + url, init)
+    return fetch(SERVER + url, init)
         .then(res => {
             response = {
                 status: res.status,

@@ -486,11 +486,10 @@ export const Publisher = ({setRoute, id}) => {
 
                     <Button
                         variant="contained"
-                        color="secondary"
                         style={{margin: '1rem'}}
                         onClick={() => setRoute('publishers')}
                     >
-                        cancel
+                        back
                     </Button>
                     <Button
                         variant="contained"

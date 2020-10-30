@@ -10,6 +10,4 @@ const isLocalhost = Boolean(
 
 export const SERVER = isLocalhost
     ? 'http://127.0.0.1:8000/'
-    : window.location.href === 'https://app.gaff.u0087004.plsk.regruhosting.ru/'
-        ? 'https://gaff.u0087004.plsk.regruhosting.ru/'
-        : window.location.href
+    : window.location.href

@@ -66,6 +66,7 @@ const headCells = [
     {id: 'publisher', label: 'Publisher'},
     {id: 'name', label: 'Domain'},
     {id: 'assets', label: 'assets name'},
+    {id: 'asset_id', label: 'assets ID'},
     {id: 'app_ads', label: 'app-ads.txt entries'},
     {id: 'ads', label: 'ads.txt entries'},
 ];
@@ -161,6 +162,7 @@ export const Reports = ({setRoute}) => {
     const [filterPublisher, setFilterPublisher] = useState('')
     const [filterDomain, setFilterDomain] = useState('')
     const [filterAsset, setFilterAsset] = useState('')
+    const [filterAssetID, setFilterAssetID] = useState('')
 
 
     useEffect(() => {
@@ -211,7 +213,7 @@ export const Reports = ({setRoute}) => {
                     className={(classes.grid)}
                     spacing={1}
                 >
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                         <FormControl fullWidth>
                             <InputLabel>Select publisher...</InputLabel>
 
@@ -229,7 +231,7 @@ export const Reports = ({setRoute}) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                         <FormControl fullWidth>
                             <InputLabel>Select domain...</InputLabel>
 
@@ -247,7 +249,7 @@ export const Reports = ({setRoute}) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={5}>
                         <FormControl fullWidth>
                             <InputLabel id="demo-simple-select-helper-label">Select asset...</InputLabel>
                             <Select
@@ -260,6 +262,26 @@ export const Reports = ({setRoute}) => {
                                 {[].concat(...rows.map(r => r.assets)
                                     .filter(a => a.length > 0)
                                     .map(a => a.map(a => a.asset_name)))
+                                    .filter((a, i, self) => self.indexOf(a) === i)
+                                    .map(a => <MenuItem value={a} key={"ecgnqweixqguyqgnq" + a}>
+                                        {a}
+                                    </MenuItem>)}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={5}>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-helper-label">Select asset ID...</InputLabel>
+                            <Select
+                                fullWidth
+                                value={filterAssetID}
+                                onChange={e => setFilterAssetID(e.target.value)}
+                            >
+                                <MenuItem value={''}>None</MenuItem>
+                                <MenuItem value={'not exists'}>Not exists</MenuItem>
+                                {[].concat(...rows.map(r => r.assets)
+                                    .filter(a => a.length > 0)
+                                    .map(a => a.map(a => a.asset_id)))
                                     .filter((a, i, self) => self.indexOf(a) === i)
                                     .map(a => <MenuItem value={a} key={"ecgnqweixqguyqgnq" + a}>
                                         {a}
@@ -302,6 +324,20 @@ export const Reports = ({setRoute}) => {
 
         if (filterDomain && filterDomain !== row.name) return false
 
+        if (filterAssetID) {
+
+            if (!(filterAssetID === 'not exists' && row.assets.length === 0)) {
+
+                if (!Boolean(row.assets.find(a => filterAssetID === a.asset_id))) {
+
+                    return false;
+
+                }
+
+            }
+
+        }
+
         if (filterAsset) {
 
             if (filterAsset === 'not exists' && row.assets.length === 0) {
@@ -323,6 +359,14 @@ export const Reports = ({setRoute}) => {
         : <List>
             {value.map(a => <ListItem key={"assetskeyfowqerg" + a.id}>
                 {a.asset_name}
+            </ListItem>)}
+        </List>
+
+    const assetsIDRender = value => value.length === 0
+        ? 'not exists'
+        : <List>
+            {value.map(a => <ListItem key={"assetskeyfowqerweffg" + a.id}>
+                {a.asset_id}
             </ListItem>)}
         </List>
 
@@ -391,6 +435,7 @@ export const Reports = ({setRoute}) => {
                                             </TableCell>
                                             <TableCell align="center">{row.name}</TableCell>
                                             <TableCell align="center">{assetsRender(row.assets)}</TableCell>
+                                            <TableCell align="center">{assetsIDRender(row.assets)}</TableCell>
                                             <TableCell align="center">{entriesRender(row.app_ads)}</TableCell>
                                             <TableCell align="center">{entriesRender(row.ads)}</TableCell>
                                         </TableRow>
